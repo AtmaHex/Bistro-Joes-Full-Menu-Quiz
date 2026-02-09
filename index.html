@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bistro Joe's Menu Flashcards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+
+.card-face {
+  max-width: 600px;
+  height: 200px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  background-color: #fffefc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+/* Button row styling beneath the card */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+
+.card-face {
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  background-color: #fffefc;
+}
+
+
+.hidden {
+  display: none !important;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    h1 {
+      margin-top: 0.5rem;
+      font-size: 2rem;
+    }
+    .controls {
+      text-align: center;
+      margin: 1rem 0;
+      transition: opacity 0.5s ease;
+    }
+    .controls.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .flashcard {
+      width: 90%;
+      max-width: 600px;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      perspective: 1000px;
+      margin-top: 0.5rem;
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+      min-height: 240px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      position: relative;
+      cursor: pointer;
+    }
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+  flex-direction: column;
+  justify-content: flex-start;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      text-align: center;
+     font-size: 1.4rem; line-height: 1.8rem;}
+    .card-front {
+      background: #fff;
+    }
+    .card-back {
+      background: #f8f9fa;
+      transform: rotateY(180deg);
+    }
+    
+.button-group {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+    button {
+      font-size: 1rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    .start-btn {
+      background-color: #343a40;
+      color: white;
+    }
+    .correct-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .wrong-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    .fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: scale(0.95); pointer-events: none; }
+    }
+  
+@media (max-width: 600px) {
+  .flashcard {
+    aspect-ratio: 3 / 4;
+    max-width: 90%;
+  }
+  .card-face div {
+  font-size: 1.3rem;
+  line-height: 1.6rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 600px) {
+  .flashcard-container {
+    margin-top: 40px;
+  }
+}
+@media (max-width: 600px) {
+  .flashcard-container {
+    margin-top: 20vh;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<h1>Bistro Joe's Menu Flashcards</h1>
+
+<div class="controls" id="setupControls">
+  <label><input type="checkbox" name="category" value="drinks"> Drinks</label><br/>
+  <label><input type="checkbox" name="category" value="brunch"> Brunch</label><br/>
+  <label><input type="checkbox" name="category" value="dinner"> Dinner</label><br/>
+  <label><input type="checkbox" name="category" value="happy_hour"> Happy Hour</label><br/>
+  <label><input type="checkbox" name="category" value="full_menu" checked> Full Menu</label><br/><br/>
+  <div id="availableCount">Available Questions: 0</div>
+<br/><label><input type="checkbox" id="commonWrongOnly"> Quiz: Commonly Wrong Only</label>
+<br/><button onclick="clearStats()">Clear Wrong Answers</button>
+
+  <label>Limit: <input type="number" id="questionLimit" value="10" min="1" style="width:60px;"></label><br/><br/>
+  
+<div id="statsPanel" style="max-height: 200px; overflow-y: auto; background: white; border-radius: 8px; padding: 1rem; margin-top: 1rem; width: 90%; max-width: 500px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+  <h3>Stats Dashboard</h3>
+  <ul id="statsList" style="list-style: none; padding: 0; font-size: 0.9rem;"></ul>
+</div>
+
+<button class="start-btn" onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div class="flashcard" style="display:none;" id="flashcard" onclick="flipCard()">
+  <div class="card" id="cardInner">
+    <div class="card-face card-front" id="question"></div>
+    <div class="card-face card-back" id="answer"></div>
+  </div>
+</div>
+
+<div class="button-group" id="responseButtons" style="display:none;">
+  <button class="start-btn" onclick="goBack()">Back</button>
+  <button class="correct-btn" onclick="markCorrect()">Correct</button>
+  <button class="wrong-btn" onclick="markWrong()">Wrong</button>
+</div>
+
+<script>
+const questionBank = {"drinks": [["What is in the Spicy Margarita?", "Casamigos Blanco, Fresh Lime Juice, Orange Liqueur, Muddled Jalape\u00f1o, Agave, Tajin Rim"], ["What is in the Woodward Cosmo?", "Tito\u2019s, Triple Sec, Pama Liqueur, Lime Juice"], ["What is in Summer in the Hamptons?", "Pineapple Vodka, Fresh Lime, Strawberry Mint Shrub, Champagne Float"], ["What is in Cool as a Cucumber?", "Cucumber Vodka, Domaine de Canton, Basil"], ["What is in the Bistro Old Fashioned?", "Bourbon, Angostura Bitters, Simple Syrup, Orange Peel, Cherry"], ["What is in the Manhattan?", "Bourbon, Sweet Vermouth, Bitters"], ["What is in the Market Espresso Martini?", "Vanilla Vodka, Coffee Liqueur, Espresso"], ["What is in the Limoncello Spritz?", "Prosecco, Limoncello, Soda Splash, Fresh Lemon and Basil"], ["What is in the Pear Ginger?", "Pear Vodka, Domaine de Canton, Lemon, Pear Pur\u00e9e"], ["What wines are available for $6 a glass?", "Brut Cava, Ros\u00e9, Chardonnay, Sauvignon Blanc, Riesling, Pinot Noir, Cabernet Sauvignon"], ["Which drafts are offered for $5?", "Bell\u2019s Two Hearted, Guinness, Stella Artois, Blake\u2019s Cider, Black Rock\u2019s My Kiss"], ["How many rotating taps are offered?", "7"], ["What is the price of a House Cocktail?", "$7"]], "brunch": [["What is in the Avocado Toast App?", "Ciabatta, Guacamole, Arugula, Cherry Tomatoes, Avocado, Red Onion, Capers"], ["What is in Ralph\u2019s Signature Scones?", "House Baked Scones, Butter, Jam, Whipped Cream"], ["What is in the Shrimp Grits?", "Hominy Grits, Jumbo Tiger Shrimp, Garlic White Wine Butter Sauce"], ["What is in the Fresh Fruit Bowl?", "Seasonal Fruit Assortment"], ["What is in the Ultimate French Toast?", "Berries, Apple Sauce, Maple Syrup, Vanilla Ice Cream"], ["What is in the Peanut Butter and Banana French Toast?", "Fresh Ground Peanut Butter, Maple Syrup, Vanilla Ice Cream"], ["What is in the Berry Waffle Tower?", "3 Mini Belgian Waffles, Berries, Whipped Cream"], ["What is in the Buttermilk Pancakes?", "Maple Syrup, Fresh Berries"], ["What is in the Blueberry Lemon Ricotta Pancakes?", "Lemon Ricotta Pancakes, Strawberries, Fresh Blueberries, Lemon Zest, Maple Syrup"], ["What is in Praise the Lard?", "Short Ribs, Cheddar, Fried Eggs, Hominy Grits, Crispy Fried Onions, Chipotle BBQ Sauce"], ["What is in the Cowboy Skillet?", "Filet, Breakfast Potatoes, Peppers, Onions, Fried Eggs, Cilantro, Chipotle Mayo, Bacon Bits"], ["What is in Joe\u2019s Loaded Skillet?", "Bacon, Sausage, Fried Eggs, Grits, Cheddar, BJ Sauce"], ["What is in the Huevos Rancheros Skillet?", "Fried Eggs, Corn Tortillas, Black Beans Fiesta Mix, Queso Fresco, Chipotle Slaw, Sliced Avocado, Crema"], ["What is in Oh Behave 'Benny'?", "Poached Eggs, Shaved Ham, Tomato Chutney, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the 'Krabby Patty' Benny?", "Poached Eggs, Lump Crab, Tomato, Avocado, Bacon, Jalape\u00f1o, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the Short Rib Benny?", "Poached Eggs, Braised Beef Short Rib, Crispy Fried Onions, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the Smoked Salmon Benny?", "Poached Eggs, Atlantic Smoked Salmon, Grilled Asparagus, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the Farmer\u2019s Grub Omelette?", "Applewood Smoked Bacon, Sausage or Ham, Cheddar Cheese, Breakfast Potatoes"], ["What is in the Healthy Egg Omelette?", "Egg Whites, Spinach, Mushrooms, Caramelized Onions, Asparagus, Artichokes, Roasted Tomato, Peppers, Basil Pesto, Fruit"], ["What is in the Wild Mushroom Omelette?", "Caramelized Onions, White Cheddar, Breakfast Potatoes"], ["What is in the Savory Short Rib Omelette?", "Mushrooms, Caramelized Onions, Peppers, White Cheddar, Horseradish Cream Sauce, Breakfast Potatoes"]], "dinner": [["What is in the Fresh Caught Oysters?", "Flown in fresh, House Cocktail, Horseradish, Lemon"], ["What is in the Jumbo Shrimp Cocktail?", "Flown in fresh, House Cocktail, Lemon"], ["What is in the Ahi Tuna Tacushi?", "Cilantro, Spicy Mayo, Crispy Wonton, Tobiko"], ["What is in the Crab Cakes?", "Jumbo Lump Crab, Arugula, Garlic Aioli"], ["What is in the Calamari?", "Fresh Calamari Steaks, Flash Fried, Lemon Beurre Blanc, Capers, Cherry Tomatoes, Lemon"], ["What is in the Grilled Octopus?", "Spinach, Arugula, Cherry Tomato, Feta Cream, Lemon Sumac"], ["What is in the Mussels Diablo?", "Garlic Butter, White Wine, Cherry Tomatoes, Peppers, Crostini"], ["What is in the Woodward Steak Tips?", "Filet, Caramelized Onion, Mushroom, Blue Cheese, Zip Sauce"], ["What is in the Truffle Burrata & Heirloom Tomato?", "Burrata, Heirloom Tomatoes, Balsamic Glaze, Grilled Crostini, Add Prosciutto"], ["What is in the Brussels Sprouts?", "White Balsamic, Red Onion, Truffle Vinaigrette, Parmesan"], ["What sliders are offered?", "Wagyu Beef, Crab Cake, Short Rib"], ["What is in the Pomme Frites?", "Classic Thin-Cut Fries"], ["What is in the Truffle-Parmesan Frites?", "Fries, Truffle Oil, Parmesan"], ["What is in the Shrimp & Grits?", "Hominy Grits, Jumbo Shrimp, Garlic White Wine Butter"], ["What is in the Hummus, Za\u2019atar Pita & Vegetables?", "Olive Oil, Kalamata Olive, Paprika"], ["What is in the Savory Jumbo Meatballs?", "Two Jumbo Meatballs, Roasted Tomato, Ricotta, Fresh Basil"], ["What is in the Sticky Ribs?", "Hoisin Glaze, Sesame Seeds, Chipotle Slaw"], ["What is in the Crab Stuffed Mushrooms?", "Bell Pepper, Panko, Cheddar, Dijon Cream"], ["What is in the Seared Diver Scallops?", "Jumbo Scallops, Parsnip Pur\u00e9e, Pancetta, Asparagus Tips"], ["What is in the Chicken Beurre Blanc?", "Airline Chicken, Asparagus, Roasted Mushrooms, Saut\u00e9ed Spinach, Fingerling Potatoes, Lemon Beurre Blanc"], ["What is in the Short Ribs?", "Grits, Roasted Brussels, Pickled Cabbage, Au Jus"], ["What is in the Steak Frites?", "8 oz. Sliced Filet, Rosemary Tallis, Parmesan Truffle Fries, Zip Sauce"], ["What are the Butcher Block entr\u00e9e choices?", "Prime 8 oz. Grilled Filet Mignon, Prime 14 oz. Grilled NY Strip, Prime 18 oz. Bone-In Ribeye, Colorado Lamb Chops, Prime Filet & Lobster, Twin Tail Lobsters"], ["What are the Butcher Block side options?", "French Green Beans, Roasted Brussels, Asparagus, Petite Potatoes, Truffle Mash, Pomme Frites"]], "happy_hour": [["What is the Happy Hour price for oysters?", "$1 each"], ["What is in the Ahi Tuna Tacushi?", "Cilantro, Spicy Mayo, Crispy Wontons"], ["What is in the Mussels Diablo?", "Garlic Butter, White Wine, Tomatoes, Peppers"], ["What is in the Calamari?", "Flash Fried Calamari Steaks, Lemon Beurre Blanc, Capers, Tomatoes"], ["What is in the Brussel Sprouts?", "White Balsamic, Red Onion, Truffle, Parmesan"], ["What is in the Crab Stuffed Mushrooms?", "Bell Pepper, Panko, Cheddar, Dijon Cream"], ["What is in the Hummus, Za\u2019atar Pita Chips and Veggies?", "Olive Oil, Paprika, Crispy Chickpeas"], ["What types of sliders are available during Happy Hour?", "Wagyu Beef, Short Rib, Crab Cake"], ["What is in the Margherita Flatbread?", "Vine Ripe Tomato, Basil, Garlic, Fresh Mozzarella, EVOO"], ["What is in the Truffle Frites?", "Fries, Truffle Oil, Parmesan"], ["What is the price of Pomme Frites during Happy Hour?", "$5"], ["How much are Craft Cocktails during Happy Hour?", "$9"], ["Which wines are available for $6 during Happy Hour?", "Brut Cava, Ros\u00e9, Chardonnay, Sauvignon Blanc, Riesling, Pinot Noir, Cabernet Sauvignon"], ["Which drafts are offered for $5 during Happy Hour?", "Bell\u2019s Two Hearted, Guinness, Stella Artois, Blake\u2019s Cider, Black Rock\u2019s My Kiss"], ["How many rotating taps are available?", "7"], ["How much are House Cocktails during Happy Hour?", "$7"]], "full_menu": [["What is in the Spicy Margarita?", "Casamigos Blanco, Fresh Lime Juice, Orange Liqueur, Muddled Jalape\u00f1o, Agave, Tajin Rim"], ["What is in the Woodward Cosmo?", "Tito\u2019s, Triple Sec, Pama Liqueur, Lime Juice"], ["What is in Summer in the Hamptons?", "Pineapple Vodka, Fresh Lime, Strawberry Mint Shrub, Champagne Float"], ["What is in Cool as a Cucumber?", "Cucumber Vodka, Domaine de Canton, Basil"], ["What is in the Bistro Old Fashioned?", "Bourbon, Angostura Bitters, Simple Syrup, Orange Peel, Cherry"], ["What is in the Manhattan?", "Bourbon, Sweet Vermouth, Bitters"], ["What is in the Market Espresso Martini?", "Vanilla Vodka, Coffee Liqueur, Espresso"], ["What is in the Limoncello Spritz?", "Prosecco, Limoncello, Soda Splash, Fresh Lemon and Basil"], ["What is in the Pear Ginger?", "Pear Vodka, Domaine de Canton, Lemon, Pear Pur\u00e9e"], ["What wines are available for $6 a glass?", "Brut Cava, Ros\u00e9, Chardonnay, Sauvignon Blanc, Riesling, Pinot Noir, Cabernet Sauvignon"], ["Which drafts are offered for $5?", "Bell\u2019s Two Hearted, Guinness, Stella Artois, Blake\u2019s Cider, Black Rock\u2019s My Kiss"], ["How many rotating taps are offered?", "7"], ["What is the price of a House Cocktail?", "$7"], ["What is in the Avocado Toast App?", "Ciabatta, Guacamole, Arugula, Cherry Tomatoes, Avocado, Red Onion, Capers"], ["What is in Ralph\u2019s Signature Scones?", "House Baked Scones, Butter, Jam, Whipped Cream"], ["What is in the Shrimp Grits?", "Hominy Grits, Jumbo Tiger Shrimp, Garlic White Wine Butter Sauce"], ["What is in the Fresh Fruit Bowl?", "Seasonal Fruit Assortment"], ["What is in the Ultimate French Toast?", "Berries, Apple Sauce, Maple Syrup, Vanilla Ice Cream"], ["What is in the Peanut Butter and Banana French Toast?", "Fresh Ground Peanut Butter, Maple Syrup, Vanilla Ice Cream"], ["What is in the Berry Waffle Tower?", "3 Mini Belgian Waffles, Berries, Whipped Cream"], ["What is in the Buttermilk Pancakes?", "Maple Syrup, Fresh Berries"], ["What is in the Blueberry Lemon Ricotta Pancakes?", "Lemon Ricotta Pancakes, Strawberries, Fresh Blueberries, Lemon Zest, Maple Syrup"], ["What is in Praise the Lard?", "Short Ribs, Cheddar, Fried Eggs, Hominy Grits, Crispy Fried Onions, Chipotle BBQ Sauce"], ["What is in the Cowboy Skillet?", "Filet, Breakfast Potatoes, Peppers, Onions, Fried Eggs, Cilantro, Chipotle Mayo, Bacon Bits"], ["What is in Joe\u2019s Loaded Skillet?", "Bacon, Sausage, Fried Eggs, Grits, Cheddar, BJ Sauce"], ["What is in the Huevos Rancheros Skillet?", "Fried Eggs, Corn Tortillas, Black Beans Fiesta Mix, Queso Fresco, Chipotle Slaw, Sliced Avocado, Crema"], ["What is in Oh Behave 'Benny'?", "Poached Eggs, Shaved Ham, Tomato Chutney, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the 'Krabby Patty' Benny?", "Poached Eggs, Lump Crab, Tomato, Avocado, Bacon, Jalape\u00f1o, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the Short Rib Benny?", "Poached Eggs, Braised Beef Short Rib, Crispy Fried Onions, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the Smoked Salmon Benny?", "Poached Eggs, Atlantic Smoked Salmon, Grilled Asparagus, Hollandaise, Toasted Ciabatta, Breakfast Potatoes"], ["What is in the Farmer\u2019s Grub Omelette?", "Applewood Smoked Bacon, Sausage or Ham, Cheddar Cheese, Breakfast Potatoes"], ["What is in the Healthy Egg Omelette?", "Egg Whites, Spinach, Mushrooms, Caramelized Onions, Asparagus, Artichokes, Roasted Tomato, Peppers, Basil Pesto, Fruit"], ["What is in the Wild Mushroom Omelette?", "Caramelized Onions, White Cheddar, Breakfast Potatoes"], ["What is in the Savory Short Rib Omelette?", "Mushrooms, Caramelized Onions, Peppers, White Cheddar, Horseradish Cream Sauce, Breakfast Potatoes"], ["What is in the Fresh Caught Oysters?", "Flown in fresh, House Cocktail, Horseradish, Lemon"], ["What is in the Jumbo Shrimp Cocktail?", "Flown in fresh, House Cocktail, Lemon"], ["What is in the Ahi Tuna Tacushi?", "Cilantro, Spicy Mayo, Crispy Wonton, Tobiko"], ["What is in the Crab Cakes?", "Jumbo Lump Crab, Arugula, Garlic Aioli"], ["What is in the Calamari?", "Fresh Calamari Steaks, Flash Fried, Lemon Beurre Blanc, Capers, Cherry Tomatoes, Lemon"], ["What is in the Grilled Octopus?", "Spinach, Arugula, Cherry Tomato, Feta Cream, Lemon Sumac"], ["What is in the Mussels Diablo?", "Garlic Butter, White Wine, Cherry Tomatoes, Peppers, Crostini"], ["What is in the Woodward Steak Tips?", "Filet, Caramelized Onion, Mushroom, Blue Cheese, Zip Sauce"], ["What is in the Truffle Burrata & Heirloom Tomato?", "Burrata, Heirloom Tomatoes, Balsamic Glaze, Grilled Crostini, Add Prosciutto"], ["What is in the Brussels Sprouts?", "White Balsamic, Red Onion, Truffle Vinaigrette, Parmesan"], ["What sliders are offered?", "Wagyu Beef, Crab Cake, Short Rib"], ["What is in the Pomme Frites?", "Classic Thin-Cut Fries"], ["What is in the Truffle-Parmesan Frites?", "Fries, Truffle Oil, Parmesan"], ["What is in the Shrimp & Grits?", "Hominy Grits, Jumbo Shrimp, Garlic White Wine Butter"], ["What is in the Hummus, Za\u2019atar Pita & Vegetables?", "Olive Oil, Kalamata Olive, Paprika"], ["What is in the Savory Jumbo Meatballs?", "Two Jumbo Meatballs, Roasted Tomato, Ricotta, Fresh Basil"], ["What is in the Sticky Ribs?", "Hoisin Glaze, Sesame Seeds, Chipotle Slaw"], ["What is in the Crab Stuffed Mushrooms?", "Bell Pepper, Panko, Cheddar, Dijon Cream"], ["What is in the Seared Diver Scallops?", "Jumbo Scallops, Parsnip Pur\u00e9e, Pancetta, Asparagus Tips"], ["What is in the Chicken Beurre Blanc?", "Airline Chicken, Asparagus, Roasted Mushrooms, Saut\u00e9ed Spinach, Fingerling Potatoes, Lemon Beurre Blanc"], ["What is in the Short Ribs?", "Grits, Roasted Brussels, Pickled Cabbage, Au Jus"], ["What is in the Steak Frites?", "8 oz. Sliced Filet, Rosemary Tallis, Parmesan Truffle Fries, Zip Sauce"], ["What are the Butcher Block entr\u00e9e choices?", "Prime 8 oz. Grilled Filet Mignon, Prime 14 oz. Grilled NY Strip, Prime 18 oz. Bone-In Ribeye, Colorado Lamb Chops, Prime Filet & Lobster, Twin Tail Lobsters"], ["What are the Butcher Block side options?", "French Green Beans, Roasted Brussels, Asparagus, Petite Potatoes, Truffle Mash, Pomme Frites"], ["What is the Happy Hour price for oysters?", "$1 each"], ["What is in the Ahi Tuna Tacushi?", "Cilantro, Spicy Mayo, Crispy Wontons"], ["What is in the Mussels Diablo?", "Garlic Butter, White Wine, Tomatoes, Peppers"], ["What is in the Calamari?", "Flash Fried Calamari Steaks, Lemon Beurre Blanc, Capers, Tomatoes"], ["What is in the Brussel Sprouts?", "White Balsamic, Red Onion, Truffle, Parmesan"], ["What is in the Crab Stuffed Mushrooms?", "Bell Pepper, Panko, Cheddar, Dijon Cream"], ["What is in the Hummus, Za\u2019atar Pita Chips and Veggies?", "Olive Oil, Paprika, Crispy Chickpeas"], ["What types of sliders are available during Happy Hour?", "Wagyu Beef, Short Rib, Crab Cake"], ["What is in the Margherita Flatbread?", "Vine Ripe Tomato, Basil, Garlic, Fresh Mozzarella, EVOO"], ["What is in the Truffle Frites?", "Fries, Truffle Oil, Parmesan"], ["What is the price of Pomme Frites during Happy Hour?", "$5"], ["How much are Craft Cocktails during Happy Hour?", "$9"], ["Which wines are available for $6 during Happy Hour?", "Brut Cava, Ros\u00e9, Chardonnay, Sauvignon Blanc, Riesling, Pinot Noir, Cabernet Sauvignon"], ["Which drafts are offered for $5 during Happy Hour?", "Bell\u2019s Two Hearted, Guinness, Stella Artois, Blake\u2019s Cider, Black Rock\u2019s My Kiss"], ["How many rotating taps are available?", "7"], ["How much are House Cocktails during Happy Hour?", "$7"]]};
+let filteredQuestions = [], current = 0, score = 0, total = 0;
+
+function getSelectedPool() {
+  const selected = Array.from(document.querySelectorAll("input[name=category]:checked")).map(cb => cb.value);
+  return selected.includes("full_menu") ? questionBank["full_menu"]
+       : selected.flatMap(cat => questionBank[cat] || []);
+}
+
+function updateAvailableCount() {
+  let selectedPool = getSelectedPool();
+  document.getElementById("availableCount").innerText = "Available Questions: " + selectedPool.length;
+}
+
+function startQuiz() {
+  score = 0; total = 0; current = 0;
+  let pool = getSelectedPool();
+  let commonOnly = document.getElementById("commonWrongOnly").checked;
+  if (commonOnly) {
+    pool = pool.filter(([q]) => stats[q] && stats[q].wrong >= 2);
+  }
+  const limit = parseInt(document.getElementById("questionLimit").value);
+  shuffle(pool);
+  filteredQuestions = (!isNaN(limit) && limit > 0) ? pool.slice(0, Math.min(limit, pool.length)) : pool;
+  document.getElementById("setupControls").classList.add("hidden");
+  document.querySelector("h1").style.display = "none";
+  document.getElementById("flashcard").style.display = "block";
+  document.getElementById("responseButtons").style.display = "flex";
+  updateCard();
+}
+
+function updateCard() {
+  const [q, a] = filteredQuestions[current];
+  document.getElementById("question").innerHTML = "<div style=\"font-weight:bold; margin-bottom:0.5rem;\">Question:</div><div>" + q + "</div>";
+  document.getElementById("answer").innerHTML = "<div style=\"font-weight:bold; margin-bottom:0.5rem;\">Answer:</div><div>" + a + "</div>";
+  document.getElementById("cardInner").classList.remove("flipped");
+}
+
+function flipCard() {
+  document.getElementById("cardInner").classList.toggle("flipped");
+}
+
+function markCorrect() {
+  score++; total++;
+  nextCard();
+}
+
+function markWrong() {
+  total++;
+  nextCard();
+}
+
+function nextCard() {
+  current++;
+  if (current >= filteredQuestions.length) {
+    showModal("🎉 You got " + score + " out of " + total + " correct!");
+    return;
+  }
+  updateCard();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+document.querySelectorAll("input[name=category]").forEach(cb =>
+  cb.addEventListener("change", updateAvailableCount)
+);
+updateAvailableCount();
+
+function showModal(message) {
+  document.getElementById("summaryText").innerText = message;
+  document.getElementById("scoreModal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("scoreModal").style.display = "none";
+  goBack();
+}
+
+function goBack() {
+  document.getElementById("flashcard").style.display = "none";
+  document.getElementById("responseButtons").style.display = "none";
+  document.getElementById("setupControls").classList.remove("hidden");
+}
+
+
+let stats = JSON.parse(localStorage.getItem("questionStats") || "{}");
+
+function updateStats(q, wasWrong) {
+  if (!stats[q]) stats[q] = { attempts: 0, wrong: 0 };
+  stats[q].attempts += 1;
+  if (wasWrong) stats[q].wrong += 1;
+  localStorage.setItem("questionStats", JSON.stringify(stats));
+}
+
+function clearStats() {
+  localStorage.removeItem("questionStats");
+  stats = {};
+  alert("Stats cleared.");
+}
+
+function markCorrect() {
+  let q = filteredQuestions[current][0];
+  updateStats(q, false);
+  score++; total++;
+  nextCard();
+}
+
+function markWrong() {
+  let q = filteredQuestions[current][0];
+  updateStats(q, true);
+  total++;
+  nextCard();
+}
+
+
+function updateStatsDashboard() {
+  const list = document.getElementById("statsList");
+  list.innerHTML = "";
+  for (const [q, data] of Object.entries(stats)) {
+    const item = document.createElement("li");
+    item.innerText = `${q} — Attempts: ${data.attempts}, Wrong: ${data.wrong}`;
+    list.appendChild(item);
+  }
+}
+
+// Call on load to populate
+updateStatsDashboard();
+
+
+function updateStatsDashboard() {
+  const list = document.getElementById("statsList");
+  list.innerHTML = "";
+
+  const categoryLabels = {
+    dinner: "🥩 Dinner",
+    brunch: "🍳 Brunch",
+    drinks: "🍹 Drinks",
+    happy_hour: "🦪 Happy Hour",
+    full_menu: "🧠 Full Menu (combined)"
+  };
+
+  // Accuracy header
+  const header = document.createElement("li");
+  header.innerHTML = "<strong>📊 Accuracy by Category</strong>";
+  list.appendChild(header);
+
+  for (const cat of ["dinner", "brunch", "drinks", "happy_hour"]) {
+    let total = 0, correct = 0;
+    for (const [q] of questionBank[cat] || []) {
+      if (stats[q]) {
+        total += stats[q].attempts;
+        correct += stats[q].attempts - stats[q].wrong;
+      }
+    }
+    const percent = total > 0 ? Math.round((correct / total) * 100) : "N/A";
+    const li = document.createElement("li");
+    li.textContent = `${categoryLabels[cat]}: ${percent}% Correct`;
+    list.appendChild(li);
+  }
+
+  // Breakdown
+  const brkHeader = document.createElement("li");
+  brkHeader.innerHTML = "<br/><strong>📦 Question Bank Breakdown</strong>";
+  list.appendChild(brkHeader);
+
+  for (const cat of ["dinner", "brunch", "drinks", "happy_hour", "full_menu"]) {
+    const li = document.createElement("li");
+    li.textContent = `${categoryLabels[cat]}: ${(questionBank[cat] || []).length}`;
+    list.appendChild(li);
+  }
+}
+
+
+function syncCategoryCheckboxes() {
+  const fullMenu = document.querySelector('input[value="full_menu"]');
+  const others = Array.from(document.querySelectorAll('input[name="category"]')).filter(cb => cb.value !== "full_menu");
+  const othersChecked = others.some(cb => cb.checked);
+
+  fullMenu.disabled = othersChecked;
+  fullMenu.title = othersChecked ? "Deselect other categories to enable Full Menu" : "";
+
+  others.forEach(cb => {
+    cb.disabled = fullMenu.checked;
+    cb.title = fullMenu.checked ? "Deselect Full Menu to enable individual categories" : "";
+  });
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateAvailableCount();
+  document.getElementById("commonWrongOnly").addEventListener("change", updateAvailableCount);
+
+  const allCats = document.querySelectorAll('input[name="category"]');
+  allCats.forEach(cb => {
+    cb.addEventListener("change", () => {
+      updateAvailableCount();
+      syncCategoryCheckboxes();
+    });
+  });
+
+  syncCategoryCheckboxes();  // Initial state
+});
+
+</script>
+
+<!-- Score Summary Modal -->
+<div id="scoreModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div style="background:white; padding:2rem; border-radius:8px; text-align:center;">
+    <h2>Quiz Summary</h2>
+    <p id="summaryText"></p>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+</body>
+</html>
